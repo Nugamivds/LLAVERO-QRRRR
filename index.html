@@ -3,77 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Video Llavero</title>
+    <title>Un Recuerdo Especial</title>
     <style>
-        /* Pantalla completa y fondo negro */
         body, html { 
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: #000; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            background-color: #1a0101; /* Rojo muy oscuro de fondo */
+            display: flex; justify-content: center; align-items: center; 
+            overflow: hidden; font-family: sans-serif;
+        }
+
+        /* Contenedor del video para que flote sobre los corazones */
+        .video-container {
+            position: relative;
+            z-index: 10; /* Por encima de los corazones */
+            width: 90vw;
+            height: 80vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+            border-radius: 15px;
             overflow: hidden;
-            font-family: sans-serif;
         }
 
-        /* El video ocupa toda la pantalla sin deformarse */
-        video { 
-            width: 100vw; 
-            height: 100vh; 
-            object-fit: contain; 
+        video { width: 100%; height: 100%; object-fit: contain; }
+
+        /* Estilo de los corazones animados */
+        .heart {
+            position: absolute;
+            bottom: -100px;
+            color: #ff4d4d;
+            font-size: 20px;
+            user-select: none;
+            z-index: 1;
+            animation: float 6s infinite linear;
+            opacity: 0.7;
         }
 
-        /* Botón flotante para el sonido (obligatorio en celulares) */
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            20% { opacity: 0.8; }
+            100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+        }
+
         #btnSonido {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 30px;
-            background: rgba(255, 255, 255, 0.8);
-            color: #000;
-            border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 100;
-            transition: 0.3s;
-        }
-
-        #btnSonido:active {
-            transform: translateX(-50%) scale(0.95);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            padding: 15px 30px; background: #ff4d4d; color: white; border: none;
+            border-radius: 50px; font-weight: bold; cursor: pointer; z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); font-size: 16px;
         }
     </style>
 </head>
 <body>
 
-    <video id="miVideo" playsinline autoplay muted loop>
-        <source src="video.mp4" type="video/mp4">
-        Tu navegador no soporta video.
-    </video>
+    <div id="heart-container"></div>
 
-    <button id="btnSonido" onclick="activarAudio()">🔊 Tocar para escuchar</button>
+    <div class="video-container">
+        <video id="miVideo" playsinline autoplay muted loop>
+            <source src="video.mp4" type="video/mp4">
+            <source src="video.mov" type="video/quicktime">
+        </video>
+    </div>
+
+    <button id="btnSonido" onclick="activarAudio()">❤️ Toca para escuchar ❤️</button>
 
     <script>
+        const v = document.getElementById('miVideo');
+        
         function activarAudio() {
-            const v = document.getElementById('miVideo');
-            v.muted = false; // Quita el silencio
-            v.play();        // Asegura que siga reproduciendo
-            document.getElementById('btnSonido').style.display = 'none'; // Desaparece el botón
+            v.muted = false;
+            v.play();
+            document.getElementById('btnSonido').style.display = 'none';
         }
 
-        // Intento de autoreproducir si el navegador lo permite
-        window.addEventListener('load', () => {
-            const v = document.getElementById('miVideo');
-            v.play().catch(() => {
-                console.log("El autoreproducir requiere interacción del usuario.");
-            });
-        });
+        // Generador automático de corazones
+        function createHeart() {
+            const container = document.getElementById('heart-container');
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤️'; // Puedes cambiarlo por otros emojis si quieres
+            
+            // Posición aleatoria
+            heart.style.left = Math.random() * 100 + 'vw';
+            // Tamaño aleatorio
+            heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+            // Duración aleatoria para que no suban todos iguales
+            heart.style.animationDuration = Math.random() * 3 + 4 + 's';
+            
+            container.appendChild(heart);
+
+            // Borrar el corazón después de la animación para no saturar el celular
+            setTimeout(() => { heart.remove(); }, 7000);
+        }
+
+        // Crear un corazón cada 400 milisegundos
+        setInterval(createHeart, 400);
+
+        window.addEventListener('load', () => { v.play(); });
     </script>
 </body>
 </html>
